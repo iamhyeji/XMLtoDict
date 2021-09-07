@@ -31,8 +31,8 @@ def newfile(frame):
     dir_path = os.getcwd()
     base_name = os.path.basename(dir_path)
     for img_dir in glob.glob(f'{dir_path}/*Camera'):
-        img_path = img_dir
-    vel_path = os.path.abspath('LiDAR')
+        img_path = os.path.relpath(img_dir)
+    vel_path = os.path.relpath('LiDAR')
     meta = base_name.split('_')
     new = {
         'image': {
@@ -40,15 +40,15 @@ def newfile(frame):
             'image_path': os.path.join(img_path,f'{frame}.jpg'),
             'image_shape': np.array([], dtype = np.int32),
             'meta_data': {
-                'date' : meta[0],
-                'time' : meta[1],
-                'hz' : meta[2],
-                'location' : meta[3],
+                'yymmdd' : meta[0],
+                'hhmmss' : meta[1],
+                'sr' : meta[2],
+                'enviroment' : meta[3],
                 'weather' : meta[4],
-                'day_night':meta[5],
+                'time':meta[5],
                 'road_type':meta[6],
                 'state' : meta[7],
-                'area' : meta[8],
+                'place' : meta[8],
                 'name' : meta[9],
                 'length' : ' '.join(meta[10:])
 
