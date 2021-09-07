@@ -1,0 +1,15 @@
+Week : 2169
+Seconds : 524416.830
+Latitude(deg) : 35.153348
+Longitude(deg) : 126.793444
+Height(m) : 61.176348
+North Vel(m/s) : 0.853347
+East Vel(m/s) : -0.047718
+Up Vel(m/s) : 0.012519
+Roll(deg) : 0.028687
+Pitch(deg) : 2.142821
+Azimuth(deg) : 357.363875
+x_latitude(m) : 284127.166319
+y_longitude(m) : 181179.082690
+Velocity(kph) : 3.076700
+Status : INS_SOLUTION_GOOD
