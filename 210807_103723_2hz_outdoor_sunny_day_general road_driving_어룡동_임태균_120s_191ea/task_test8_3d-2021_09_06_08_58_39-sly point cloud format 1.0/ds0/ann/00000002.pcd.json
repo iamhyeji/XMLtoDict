@@ -1,0 +1,219 @@
+{
+    "description": "",
+    "key": "2dff3fb8-4416-49e2-b15f-99d9a3d1a57d",
+    "tags": [
+        {
+            "key": "9f50692b-c640-4524-92a8-f0a3936453c1",
+            "name": "name",
+            "value": "gnict",
+            "labelerLogin": "",
+            "createdAt": "2021-09-06 08:39:27.637583+00:00",
+            "updatedAt": "2021-09-06 08:58:39.962811+00:00"
+        },
+        {
+            "key": "24089c8c-5c49-4557-a400-54d0ed7a45c3",
+            "name": "labels",
+            "value": [
+                {
+                    "label_id": 0,
+                    "name": "자동차",
+                    "color": "#1dc799"
+                },
+                {
+                    "label_id": 1,
+                    "name": "승합차",
+                    "color": "#9dc799"
+                },
+                {
+                    "label_id": 2,
+                    "name": "기타 차량",
+                    "color": "#5d4719"
+                },
+                {
+                    "label_id": 3,
+                    "name": "성인",
+                    "color": "#dd4719"
+                },
+                {
+                    "label_id": 4,
+                    "name": "어린이",
+                    "color": "#5dc719"
+                },
+                {
+                    "label_id": 5,
+                    "name": "오토바이",
+                    "color": "#ddc719"
+                },
+                {
+                    "label_id": 6,
+                    "name": "자전거",
+                    "color": "#5d4799"
+                },
+                {
+                    "label_id": 7,
+                    "name": "운전자 신호등",
+                    "color": "#dd4799"
+                },
+                {
+                    "label_id": 8,
+                    "name": "보행자 신호등",
+                    "color": "#5dc799"
+                },
+                {
+                    "label_id": 9,
+                    "name": "교통표지",
+                    "color": "#ddc799"
+                },
+                {
+                    "label_id": 10,
+                    "name": "주차안내표지판",
+                    "color": "#1d0759"
+                },
+                {
+                    "label_id": 11,
+                    "name": "주차비 정산설비",
+                    "color": "#9d0759"
+                }
+            ],
+            "labelerLogin": "",
+            "createdAt": "2021-09-06 08:39:27.637583+00:00",
+            "updatedAt": "2021-09-06 08:58:39.962811+00:00"
+        }
+    ],
+    "objects": [
+        {
+            "key": "bf6f10b4-2d0d-4319-858f-2d7f57dd53e6",
+            "classTitle": "자동차",
+            "tags": [
+                {
+                    "key": "af202898-eb8c-4a5b-b4ff-603b3159d1fb",
+                    "name": "occluded",
+                    "value": "false",
+                    "labelerLogin": "",
+                    "createdAt": "2021-09-06 08:39:27.637583+00:00",
+                    "updatedAt": "2021-09-06 08:58:39.962811+00:00"
+                }
+            ],
+            "objects": [],
+            "figures": [],
+            "labelerLogin": "",
+            "createdAt": "2021-09-06 08:39:27.637583+00:00",
+            "updatedAt": "2021-09-06 08:58:39.962811+00:00"
+        },
+        {
+            "key": "8fb615a8-2fb4-47da-9c05-fa36311670e7",
+            "classTitle": "자동차",
+            "tags": [
+                {
+                    "key": "c0e9122d-66a4-41f8-bcda-d1fa155d2e3d",
+                    "name": "occluded",
+                    "value": "false",
+                    "labelerLogin": "",
+                    "createdAt": "2021-09-06 08:39:27.637583+00:00",
+                    "updatedAt": "2021-09-06 08:58:39.962811+00:00"
+                }
+            ],
+            "objects": [],
+            "figures": [],
+            "labelerLogin": "",
+            "createdAt": "2021-09-06 08:39:27.637583+00:00",
+            "updatedAt": "2021-09-06 08:58:39.962811+00:00"
+        },
+        {
+            "key": "12193499-e0d9-4cf7-9a3d-1d7111075475",
+            "classTitle": "자동차",
+            "tags": [
+                {
+                    "key": "274b5414-f957-4157-a19f-d91d82b0d1c9",
+                    "name": "occluded",
+                    "value": "false",
+                    "labelerLogin": "",
+                    "createdAt": "2021-09-06 08:39:27.637583+00:00",
+                    "updatedAt": "2021-09-06 08:58:39.962811+00:00"
+                }
+            ],
+            "objects": [],
+            "figures": [],
+            "labelerLogin": "",
+            "createdAt": "2021-09-06 08:39:27.637583+00:00",
+            "updatedAt": "2021-09-06 08:58:39.962811+00:00"
+        }
+    ],
+    "figures": [
+        {
+            "key": "c2e12423-d598-49e0-a9aa-6389d2dfcdc5",
+            "objectKey": "bf6f10b4-2d0d-4319-858f-2d7f57dd53e6",
+            "geometryType": "cuboid_3d",
+            "geometry": {
+                "position": {
+                    "x": 3.2,
+                    "y": -0.21,
+                    "z": 0.97
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "dimensions": {
+                    "x": 2.89,
+                    "y": 5.41,
+                    "z": 1.82
+                }
+            },
+            "labelerLogin": "",
+            "createdAt": "2021-09-06 08:39:27.637583+00:00",
+            "updatedAt": "2021-09-06 08:58:39.962811+00:00"
+        },
+        {
+            "key": "02973c7b-5b99-4432-a662-5e95efcb2c1c",
+            "objectKey": "8fb615a8-2fb4-47da-9c05-fa36311670e7",
+            "geometryType": "cuboid_3d",
+            "geometry": {
+                "position": {
+                    "x": 3.38,
+                    "y": -7.06,
+                    "z": 0.7
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "dimensions": {
+                    "x": 2.69,
+                    "y": 5.15,
+                    "z": 1.76
+                }
+            },
+            "labelerLogin": "",
+            "createdAt": "2021-09-06 08:39:27.637583+00:00",
+            "updatedAt": "2021-09-06 08:58:39.962811+00:00"
+        },
+        {
+            "key": "bbaee373-1cdf-44bf-b098-3c3362144381",
+            "objectKey": "12193499-e0d9-4cf7-9a3d-1d7111075475",
+            "geometryType": "cuboid_3d",
+            "geometry": {
+                "position": {
+                    "x": -5.08,
+                    "y": 1.99,
+                    "z": 0.76
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "dimensions": {
+                    "x": 2.44,
+                    "y": 4.68,
+                    "z": 1.82
+                }
+            },
+            "labelerLogin": "",
+            "createdAt": "2021-09-06 08:39:27.637583+00:00",
+            "updatedAt": "2021-09-06 08:58:39.962811+00:00"
+        }
+    ]
+}
