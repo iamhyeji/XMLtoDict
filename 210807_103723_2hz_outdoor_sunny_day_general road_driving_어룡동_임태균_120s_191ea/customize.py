@@ -1,5 +1,7 @@
 import numpy as np
 import os
+import io
+import zipfile
 import pickle
 import glob
 import json
@@ -66,7 +68,7 @@ def newfile(frame):
             'occluded': np.array([], dtype = np.int32),
             'alpha': np.array([]),
             'bbox': np.empty((0,4)),
-            'polygon' : np.array([]),
+            'polygon' : np.array([],dtype = '<U10'),
             'dimensions': np.empty((0,3)),
             'location': np.empty((0,3)),
             'rotation_y': np.array([]),
@@ -134,51 +136,51 @@ def updatefile3(name,object, geometry):
         pickle.dump(pkl_data, make_file)
 
 try:
-    task_list = glob.glob(f'{os.getcwd()}/task*')
+    task_list = glob.glob('task*.zip')
 
-    for task in task_list :
-        xml_file = f'{task}/annotations.xml'  #2차원
-        ann_dir = f'{task}/ds0/ann'  #3차원
-        #2차원 데이터 변환
-        if os.path.isfile(xml_file) :
-            doc = ET.parse(xml_file)
-            root = doc.getroot()
+    for task_zip in task_list :
+        with zipfile.ZipFile(task_zip) as task :
+            tlist = task.namelist()
 
-            for task in root.iter('task'):
-                size = int(task.findtext('size'))
+            if 'annotations.xml' in tlist:
+                with io.TextIOWrapper(task.open('annotations.xml', mode='r'), encoding='utf-8') as task_read :
+                    xml_file = task_read.read()
+                    root=ET.fromstring(xml_file)
 
-            for track in root.findall('track'):  
-                for i in range(0,size):
-                    box = track.find(f'box[@frame="{i}"]')
-                    polygon = track.find(f'polygon[@frame="{i}"]')
-                    frame = None
-                    if box is not None :
-                        frame = rename(box.attrib['frame'])
-                    elif polygon is not None :
-                        frame = rename(polygon.attrib['frame'])
-                    if frame :
-                        if not os.path.isfile(f'lable/{frame}.pickle'):
-                            newfile(frame)
-                        updatefile2(track, box, polygon, frame)
+                for task in root.iter('task'):
+                    size = int(task.findtext('size'))
+
+                for track in root.findall('track'):  
+                    for i in range(0,size):
+                        box = track.find(f'box[@frame="{i}"]')
+                        polygon = track.find(f'polygon[@frame="{i}"]')
+                        frame = None
+                        if box is not None :
+                            frame = rename(box.attrib['frame'])
+                        elif polygon is not None :
+                            frame = rename(polygon.attrib['frame'])
+                        if frame :
+                            if not os.path.isfile(f'lable/{frame}.pickle'):
+                                newfile(frame)
+                            updatefile2(track, box, polygon, frame)
 
         #3D 데이터 변환
-        elif os.path.isdir(ann_dir):
-            json_list = glob.glob(f'{ann_dir}/*.json')
+            elif 'meta.json' in tlist :
+                json_list = [j for j in tlist if 'ds0/ann/' in j]
 
-            for json_file in json_list :
-                base = os.path.basename(json_file)
-                name,ext = os.path.splitext(base)
-                if not os.path.isfile(f'lable/{name[:-4]}.pickle'):
-                    newfile(name[:-4])
-                with open(json_file,"r",encoding="utf8") as f :
-                    contents = f.read()
-                    json_data = json.loads(contents)
+                for json_file in json_list :
+                    name=json_file[8:-9]
+                    if not os.path.isfile(f'lable/{name}.pickle'):
+                        newfile(name)
 
-                    for object in json_data['objects'] :
+                    with io.TextIOWrapper(task.open(json_file, mode='r'), encoding='utf-8') as task_read :
+                        json_data = json.load(task_read)
 
-                        for figure in json_data['figures']:
-                            if figure['objectKey'] == object['key'] :
-                                updatefile3(name[:-4],object,figure['geometry'])
+                        for object in json_data['objects'] :
+
+                            for figure in json_data['figures']:
+                                if figure['objectKey'] == object['key'] :
+                                    updatefile3(name,object,figure['geometry'])
 
 
     #json 파일 생성
