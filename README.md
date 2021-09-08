@@ -18,7 +18,7 @@
   ├──2108  
   ├──2109  
   
-- 210712_155529_10hz_outdoor_sunny_day_general road_driving_주행_이준수_506s_5069ea 단계의 폴더 안에 해당 프로그램과 지엔랩스 내보내기 후 생성된 폴더를 추가한 뒤 해당 프로그램을 실행하여주세요  
+- 210712_155529_10hz_outdoor_sunny_day_general road_driving_주행_이준수_506s_5069ea 단계의 폴더 안에 해당 프로그램과 지엔랩스 내보내기 후 생성된 zip파일을 추가한 뒤 해당 프로그램을 실행하여주세요  
   ├──2107  
   │   ├──210712  
   │   │   ├──210712_155529_10hz_outdoor_sunny_day_general road_driving_주행_이준수_506s_5069ea  
@@ -27,12 +27,8 @@
   │   │   │   ├──INS  
   │   │   │   ├──LiDAR  
   │   │   │   ├──RADAR  
-  **│   │   │   ├──task_test8_3d-2021_09_06_08_58_39-sly point cloud format 1.0  
-  │   │   │   │   ├──ds0  
-  │   │   │   │   │   ├──ann  
-  │   │   │   │   │   │   ├──00000000.pcd.json  
-  │   │   │   ├──task_test8-2021_09_06_09_11_57-cvat for video 1.1  
-  │   │   │   │   ├──annotations.xml  
+  **│   │   │   ├──task_test8_3d-2021_09_06_08_58_39-sly point cloud format 1.0.zip  
+  │   │   │   ├──task_test8-2021_09_06_09_11_57-cvat for video 1.1.zip  
   │   │   │   ├──costomize.exe**
   
   
