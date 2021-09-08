@@ -1,0 +1,12 @@
+Wheel_Angle(deg) : -0.38
+Steer Angle(deg) : -5.20
+FL_Wheel_Dist(m) : 21856.93
+FR_Wheel_Dist(m) : 21937.27
+RL_Wheel_Dist(m) : 21606.79
+RR_Wheel_Dist(m) : 21704.51
+FL_SPD(kph) : 25.00
+FR_SPD(kph) : 24.91
+RL_SPD(kph) : 24.84
+RR_SPD(kph) : 24.81
+yawrate(deg/s) : -1.26
+ACC_LONG(m/s/s) : 0.55
