@@ -31,4 +31,5 @@
   │   │   │   ├──task_test8-2021_09_06_09_11_57-cvat for video 1.1.zip  
   │   │   │   ├──costomize.exe**
   
+  - ⭐ cutomize_top 프로그램 추가 : 상위 폴더에서 실행하면 하위 모든 파일의 데이터를 변환해줍니다.
   
