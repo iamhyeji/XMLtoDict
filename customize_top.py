@@ -32,9 +32,10 @@ def rename(frame):
 def newfile(frame,dir_path):
 
     base_name = os.path.basename(dir_path)
-
+    print(base_name)
     for img_dir in glob.glob(f'{dir_path}/*Camera'):
         img_path = os.path.relpath(img_dir)
+        print(img_path)
     vel_path = os.path.relpath(f'{dir_path}/LiDAR')
     meta = base_name.split('_')
     new = {
@@ -91,7 +92,7 @@ def updatefile2(path,track, box, polygon, frame):
         pkl_data = pickle.load(f)
 
     for data in box,polygon :
-        if data is not None :
+        if data is not None and data.attrib['outside']=='0':
             pkl_data['annos']['name']=np.append(pkl_data['annos']['name'],track.attrib['label'])
             pkl_data['annos']['occluded']=np.append(pkl_data['annos']['occluded'],int(data.attrib['occluded']))
             pkl_data['annos']['alpha']=np.append(pkl_data['annos']['alpha'],np.nan)
@@ -118,9 +119,13 @@ def updatefile3(path,name,object, geometry):
 
     with open(f'{path}/lable/{name}.pickle','rb')as f :
         pkl_data = pickle.load(f)
+    
+    for tag in object['tags'] :
+        if tag['name'] == 'occluded':
+            oc = 1 if tag['value']=='true' else 0
 
     pkl_data['annos']['name']=np.append(pkl_data['annos']['name'],object['classTitle'])
-    pkl_data['annos']['occluded']=np.append(pkl_data['annos']['occluded'],1 if object['tags'][0]['value']=='true' else 0)
+    pkl_data['annos']['occluded']=np.append(pkl_data['annos']['occluded'],oc)
     pkl_data['annos']['alpha']=np.append(pkl_data['annos']['alpha'],np.nan)
     pkl_data['annos']['bbox']=np.append(pkl_data['annos']['bbox'],np.array([[np.nan,np.nan,np.nan,np.nan]]),axis=0)
     pkl_data['annos']['polygon']=np.append(pkl_data['annos']['polygon'],np.nan)
@@ -136,82 +141,82 @@ def updatefile3(path,name,object, geometry):
     with open(f'{path}/lable/{name}.pickle', 'wb') as make_file:
         pickle.dump(pkl_data, make_file)
 
-try:
-    curr_path = os.path.dirname(os.path.realpath(__file__))
-    dir_list = ['*Camera','AVM','INS','LiDAR','RADAR','Vehicle']
+# try:
+curr_path = os.path.dirname(os.path.realpath(__file__))
+dir_list = ['*Camera','AVM','INS','LiDAR','RADAR','Vehicle']
 
-    for (path,dir,files) in os.walk(curr_path):
-        dir[:] = [d for d in dir if d not in dir_list]
-        for filename in files :
+for (path,dir,files) in os.walk(curr_path):
+    dir[:] = [d for d in dir if d not in dir_list]
+    for filename in files :
 
-            if filename.startswith('task') and filename.endswith('.zip'):
-                base_name = os.path.basename(path)
-                # print(f'{base_name} 변환 중...')
-                rel_name = os.path.relpath(path)
-                with zipfile.ZipFile(f'{path}/{filename}') as task :
-                    tlist = task.namelist()
+        if filename.startswith('task') and filename.endswith('.zip'):
+            base_name = os.path.basename(path)
+            # print(f'{base_name} 변환 중...')
+            rel_name = os.path.relpath(path)
+            with zipfile.ZipFile(f'{path}/{filename}') as task :
+                tlist = task.namelist()
 
-                    if 'annotations.xml' in tlist:
-                        with io.TextIOWrapper(task.open('annotations.xml', mode='r'), encoding='utf-8') as task_read :
-                            xml_file = task_read.read()
-                            root=ET.fromstring(xml_file)
+                if 'annotations.xml' in tlist:
+                    with io.TextIOWrapper(task.open('annotations.xml', mode='r'), encoding='utf-8') as task_read :
+                        xml_file = task_read.read()
+                        root=ET.fromstring(xml_file)
 
-                        for task in root.iter('task'):
-                            size = int(task.findtext('size'))
+                    for task in root.iter('task'):
+                        size = int(task.findtext('size'))
 
-                        for track in root.findall('track'):  
-                            for i in range(0,size):
-                                box = track.find(f'box[@frame="{i}"]')
-                                polygon = track.find(f'polygon[@frame="{i}"]')
-                                frame = None
-                                if box is not None :
-                                    frame = rename(box.attrib['frame'])
-                                elif polygon is not None :
-                                    frame = rename(polygon.attrib['frame'])
-                                if frame :
-                                    if not os.path.isfile(f'{path}/lable/{frame}.pickle'):
-                                        newfile(frame,path)
-                                    updatefile2(path,track, box, polygon, frame)
-                        
+                    for track in root.findall('track'):  
+                        for i in range(0,size):
+                            box = track.find(f'box[@frame="{i}"]')
+                            polygon = track.find(f'polygon[@frame="{i}"]')
+                            frame = None
+                            if box is not None :
+                                frame = rename(box.attrib['frame'])
+                            elif polygon is not None :
+                                frame = rename(polygon.attrib['frame'])
+                            if frame :
+                                if not os.path.isfile(f'{path}/lable/{frame}.pickle'):
+                                    newfile(frame,path)
+                                updatefile2(path,track, box, polygon, frame)
+                    
 
-                #3D 데이터 변환
-                    elif 'meta.json' in tlist :
-                        json_list = [j for j in tlist if 'ds0/ann/' in j]
+            #3D 데이터 변환
+                elif 'meta.json' in tlist :
+                    json_list = [j for j in tlist if 'ds0/ann/' in j]
 
-                        for json_file in json_list :
-                            name=json_file[8:-9]
-                            if not os.path.isfile(f'{path}/lable/{name}.pickle'):
-                                newfile(name,path)
+                    for json_file in json_list :
+                        name=json_file[8:-9]
+                        if not os.path.isfile(f'{path}/lable/{name}.pickle'):
+                            newfile(name,path)
 
-                            with io.TextIOWrapper(task.open(json_file, mode='r'), encoding='utf-8') as task_read :
-                                json_data = json.load(task_read)
+                        with io.TextIOWrapper(task.open(json_file, mode='r'), encoding='utf-8') as task_read :
+                            json_data = json.load(task_read)
 
-                                for object in json_data['objects'] :
+                            for object in json_data['objects'] :
 
-                                    for figure in json_data['figures']:
-                                        if figure['objectKey'] == object['key'] :
-                                            updatefile3(path,name,object,figure['geometry'])
-                # print(f'{base_name} 변환 완료')
+                                for figure in json_data['figures']:
+                                    if figure['objectKey'] == object['key'] :
+                                        updatefile3(path,name,object,figure['geometry'])
+            # print(f'{base_name} 변환 완료')
 
 
-                #json 파일 생성
-        pickle_list = glob.glob(f'{path}/lable/*.pickle')
-        for pickle_file in pickle_list:
-            with open(pickle_file, 'rb') as f:
-                data = pickle.load(f)
+            #json 파일 생성
+    pickle_list = glob.glob(f'{path}/lable/*.pickle')
+    for pickle_file in pickle_list:
+        with open(pickle_file, 'rb') as f:
+            data = pickle.load(f)
 
-            dumped = json.dumps(data, cls=NumpyEncoder,ensure_ascii=False)
-            dumped=dumped.replace('NaN', 'null')
+        dumped = json.dumps(data, cls=NumpyEncoder,ensure_ascii=False)
+        dumped=dumped.replace('NaN', 'null')
 
-            base = os.path.basename(pickle_file)
-            name,ext = os.path.splitext(base)
+        base = os.path.basename(pickle_file)
+        name,ext = os.path.splitext(base)
 
-            with open(f'{path}/lable/{name}.json', 'a', encoding='utf-8') as f:
-                f.write(dumped + '\n')
+        with open(f'{path}/lable/{name}.json', 'a', encoding='utf-8') as f:
+            f.write(dumped + '\n')
 
-    print('완료')
+print('완료')
 
-except Exception as e :
-    print(f'에러 발생 : {e}')
+# except Exception as e :
+#     print(f'에러 발생 : {e}')
 
-os.system('pause')
+# os.system('pause')
