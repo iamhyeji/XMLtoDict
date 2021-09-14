@@ -20,6 +20,7 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 def rename(frame):
+    frame = str(frame)
     len_of_frame = len(frame)
 
     if len_of_frame>8:
@@ -141,72 +142,80 @@ def updatefile3(name,object, geometry):
         pickle.dump(pkl_data, make_file)
 
 
-try:
-    task_list = glob.glob('task*.zip')
+# try:
+task_list = glob.glob('task*.zip')
+file_num = 0
+for task_zip in task_list :
+    with zipfile.ZipFile(task_zip) as task :
+        tlist = task.namelist()
+        
 
-    for task_zip in task_list :
-        with zipfile.ZipFile(task_zip) as task :
-            tlist = task.namelist()
+        if 'annotations.xml' in tlist:
+            print(task)
+            print(file_num)
+            with io.TextIOWrapper(task.open('annotations.xml', mode='r'), encoding='utf-8') as task_read :
+                xml_file = task_read.read()
+                root=ET.fromstring(xml_file)
 
-            if 'annotations.xml' in tlist:
-                with io.TextIOWrapper(task.open('annotations.xml', mode='r'), encoding='utf-8') as task_read :
-                    xml_file = task_read.read()
-                    root=ET.fromstring(xml_file)
+            for task in root.iter('task'):
+                size = int(task.findtext('size'))
 
-                for task in root.iter('task'):
-                    size = int(task.findtext('size'))
-
-                for track in root.findall('track'):  
-                    for i in range(0,size):
-                        box = track.find(f'box[@frame="{i}"]')
-                        polygon = track.find(f'polygon[@frame="{i}"]')
-                        frame = None
-                        if box is not None :
-                            frame = rename(box.attrib['frame'])
-                        elif polygon is not None :
-                            frame = rename(polygon.attrib['frame'])
-                        if frame :
-                            if not os.path.isfile(f'lable/{frame}.pickle'):
-                                newfile(frame)
-                            updatefile2(track, box, polygon, frame)
-
-        #3D 데이터 변환
-            elif 'meta.json' in tlist :
-                json_list = [j for j in tlist if 'ds0/ann/' in j]
-
-                for json_file in json_list :
-                    name=json_file[8:-9]
-                    if not os.path.isfile(f'lable/{name}.pickle'):
-                        newfile(name)
-
-                    with io.TextIOWrapper(task.open(json_file, mode='r'), encoding='utf-8') as task_read :
-                        json_data = json.load(task_read)
-
-                        for object in json_data['objects'] :
-
-                            for figure in json_data['figures']:
-                                if figure['objectKey'] == object['key'] :
-                                    updatefile3(name,object,figure['geometry'])
+                for i in range(0,size):
+                    newfile(rename(i+file_num))
 
 
-    #json 파일 생성
-    pickle_list = glob.glob('lable/*.pickle')
-    for pickle_file in pickle_list:
-        with open(pickle_file, 'rb') as f:
-            data = pickle.load(f)
 
-        dumped = json.dumps(data, cls=NumpyEncoder,ensure_ascii=False)
-        dumped=dumped.replace('NaN', 'null')
+            for track in root.findall('track'):  
+                for i in range(0,size):
 
-        base = os.path.basename(pickle_file)
-        name,ext = os.path.splitext(base)
+                    box = track.find(f'box[@frame="{i}"]')
+                    polygon = track.find(f'polygon[@frame="{i}"]')
 
-        with open(f'lable/{name}.json', 'a', encoding='utf-8') as f:
-            f.write(dumped + '\n')
+                    for data in box,polygon :
+                        if data is not None :
+                            frame = rename(int(data.attrib['frame'])+file_num)
+    
+                            if data.attrib['outside']=='0' :
+                                updatefile2(track, box, polygon, frame)
+            file_num += size
 
-    print('완료')
+    #3D 데이터 변환
+        elif 'meta.json' in tlist :
+            json_list = [j for j in tlist if 'ds0/ann/' in j]
 
-except Exception as e :
-    print(f'에러 발생 : {e}')
+            for json_file in json_list :
+                name=json_file[8:-9]
+                if not os.path.isfile(f'lable/{name}.pickle'):
+                    newfile(name)
 
-os.system('pause')
+                with io.TextIOWrapper(task.open(json_file, mode='r'), encoding='utf-8') as task_read :
+                    json_data = json.load(task_read)
+
+                    for object in json_data['objects'] :
+
+                        for figure in json_data['figures']:
+                            if figure['objectKey'] == object['key'] :
+                                updatefile3(name,object,figure['geometry'])
+
+
+#json 파일 생성
+pickle_list = glob.glob('lable/*.pickle')
+for pickle_file in pickle_list:
+    with open(pickle_file, 'rb') as f:
+        data = pickle.load(f)
+
+    dumped = json.dumps(data, cls=NumpyEncoder,ensure_ascii=False)
+    dumped=dumped.replace('NaN', 'null')
+
+    base = os.path.basename(pickle_file)
+    name,ext = os.path.splitext(base)
+
+    with open(f'lable/{name}.json', 'a', encoding='utf-8') as f:
+        f.write(dumped + '\n')
+
+print('완료')
+
+# except Exception as e :
+#     print(f'에러 발생 : {e}')
+
+# os.system('pause')
