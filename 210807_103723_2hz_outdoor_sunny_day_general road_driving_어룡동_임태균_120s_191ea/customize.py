@@ -85,12 +85,12 @@ def newfile(frame):
         pickle.dump(new, f)
 
 
-def updatefile2(track, box, polygon, frame):
-    with open(f'lable/{frame}.pickle','rb')as f :
+def updatefile2(path,track, box, polygon, frame):
+    with open(f'{path}/lable/{frame}.pickle','rb')as f :
         pkl_data = pickle.load(f)
 
     for data in box,polygon :
-        if data is not None :
+        if data is not None and data.attrib['outside']=='0':
             pkl_data['annos']['name']=np.append(pkl_data['annos']['name'],track.attrib['label'])
             pkl_data['annos']['occluded']=np.append(pkl_data['annos']['occluded'],int(data.attrib['occluded']))
             pkl_data['annos']['alpha']=np.append(pkl_data['annos']['alpha'],np.nan)
@@ -109,17 +109,21 @@ def updatefile2(track, box, polygon, frame):
             pkl_data['annos']['difficulty']=np.append(pkl_data['annos']['difficulty'],np.nan)
             pkl_data['annos']['num_points_in_gt']=np.append(pkl_data['annos']['num_points_in_gt'],np.nan)
         
-    with open(f'lable/{frame}.pickle', 'wb') as make_file:
+    with open(f'{path}/lable/{frame}.pickle', 'wb') as make_file:
         pickle.dump(pkl_data, make_file)
 
             
-def updatefile3(name,object, geometry):
+def updatefile3(path,name,object, geometry):
 
-    with open(f'lable/{name}.pickle','rb')as f :
+    with open(f'{path}/lable/{name}.pickle','rb')as f :
         pkl_data = pickle.load(f)
+    
+    for tag in object['tags'] :
+        if tag['name'] == 'occluded':
+            oc = 1 if tag['value']=='true' else 0
 
     pkl_data['annos']['name']=np.append(pkl_data['annos']['name'],object['classTitle'])
-    pkl_data['annos']['occluded']=np.append(pkl_data['annos']['occluded'],1 if object['tags'][0]['value']=='true' else 0)
+    pkl_data['annos']['occluded']=np.append(pkl_data['annos']['occluded'],oc)
     pkl_data['annos']['alpha']=np.append(pkl_data['annos']['alpha'],np.nan)
     pkl_data['annos']['bbox']=np.append(pkl_data['annos']['bbox'],np.array([[np.nan,np.nan,np.nan,np.nan]]),axis=0)
     pkl_data['annos']['polygon']=np.append(pkl_data['annos']['polygon'],np.nan)
@@ -132,13 +136,14 @@ def updatefile3(name,object, geometry):
     pkl_data['annos']['difficulty']=np.append(pkl_data['annos']['difficulty'],np.nan)
     pkl_data['annos']['num_points_in_gt']=np.append(pkl_data['annos']['num_points_in_gt'],np.nan)
     
-    with open(f'lable/{name}.pickle', 'wb') as make_file:
+    with open(f'{path}/lable/{name}.pickle', 'wb') as make_file:
         pickle.dump(pkl_data, make_file)
 
 try:
     task_list = glob.glob('task*.zip')
 
     for task_zip in task_list :
+        print(task_zip)
         with zipfile.ZipFile(task_zip) as task :
             tlist = task.namelist()
 
