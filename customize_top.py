@@ -142,6 +142,7 @@ def updatefile3(path,name,object, geometry):
 try:
     curr_path = os.path.dirname(os.path.realpath(__file__))
     dir_list = ['*Camera','AVM','INS','LiDAR','RADAR','Vehicle']
+    file_num = 0
 
     for (path,dir,files) in os.walk(curr_path):
         dir[:] = [d for d in dir if d not in dir_list]
@@ -162,19 +163,20 @@ try:
                         for task in root.iter('task'):
                             size = int(task.findtext('size'))
 
+                            for i in range(0,size):
+                                newfile(rename(i+file_num))
+
                         for track in root.findall('track'):  
                             for i in range(0,size):
                                 box = track.find(f'box[@frame="{i}"]')
                                 polygon = track.find(f'polygon[@frame="{i}"]')
-                                frame = None
-                                if box is not None :
-                                    frame = rename(box.attrib['frame'])
-                                elif polygon is not None :
-                                    frame = rename(polygon.attrib['frame'])
-                                if frame :
-                                    if not os.path.isfile(f'{path}/lable/{frame}.pickle'):
-                                        newfile(frame,path)
-                                    updatefile2(path,track, box, polygon, frame)
+                                for data in box,polygon :
+                                    if data is not None :
+                                        frame = rename(int(data.attrib['frame'])+file_num)
+                
+                                        if data.attrib['outside']=='0' :
+                                            updatefile2(track, box, polygon, frame)
+                            file_num += size
                         
 
                 #3D 데이터 변환
