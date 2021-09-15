@@ -20,6 +20,7 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 def rename(frame):
+    frame = str(frame)
     len_of_frame = len(frame)
 
     if len_of_frame>8:
@@ -140,6 +141,7 @@ def updatefile3(path,name,object, geometry):
         pickle.dump(pkl_data, make_file)
 
 try:
+    print('변환 중 ..')
     curr_path = os.path.dirname(os.path.realpath(__file__))
     dir_list = ['*Camera','AVM','INS','LiDAR','RADAR','Vehicle']
     file_num = 0
@@ -164,7 +166,7 @@ try:
                             size = int(task.findtext('size'))
 
                             for i in range(0,size):
-                                newfile(rename(i+file_num))
+                                newfile(rename(i+file_num),path)
 
                         for track in root.findall('track'):  
                             for i in range(0,size):
@@ -175,8 +177,8 @@ try:
                                         frame = rename(int(data.attrib['frame'])+file_num)
                 
                                         if data.attrib['outside']=='0' :
-                                            updatefile2(track, box, polygon, frame)
-                            file_num += size
+                                            updatefile2(path,track, box, polygon, frame)
+                        file_num += size
                         
 
                 #3D 데이터 변환
