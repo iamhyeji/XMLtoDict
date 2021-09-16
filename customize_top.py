@@ -201,7 +201,7 @@ try:
                 # print(f'{base_name} 변환 완료')
 
 
-                #json 파일 생성
+        #json 파일 생성
         pickle_list = glob.glob(f'{path}/lable/*.pickle')
         for pickle_file in pickle_list:
             with open(pickle_file, 'rb') as f:
