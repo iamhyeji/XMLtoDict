@@ -8,6 +8,7 @@ import json
 import numpy as np
 import xml.etree.ElementTree as ET
 
+
 class NumpyEncoder(json.JSONEncoder):
     """ Special json encoder for numpy types """
     def default(self, obj):
@@ -144,24 +145,36 @@ def updatefile3(path,name,object, geometry):
     with open(f'{path}/pickle/{name}.pickle', 'wb') as make_file:
         pickle.dump(pkl_data, make_file)
 
-# try:
-print('변환 중 ..')
-curr_path = os.path.dirname(sys.executable)   #exe파일생성시
-# curr_path = os.path.dirname(os.path.realpath(__file__))
-dir_list = ['*Camera','AVM','INS','LiDAR','RADAR','Vehicle']
+try:
+    print('변환 중 ..')
+    # curr_path = os.path.dirname(sys.executable)   #exe파일생성시
+    curr_path = os.path.dirname(os.path.realpath(__file__))
+    dir_list = ['*Camera','AVM','INS','LiDAR','RADAR','Vehicle']
 
-for (path,dir,files) in os.walk(curr_path):
-    dir[:] = [d for d in dir if d not in dir_list]
-    file_num = 0
-    for filename in files :
-        if filename.startswith('task') and filename.endswith('.zip'):
+    for (path,dir,files) in os.walk(curr_path):
+        dir[:] = [d for d in dir if d not in dir_list]
+        file_num = 0
+
+        task_list = glob.glob(f'{path}/task*.zip')
+        if task_list :
+            task_list_2d= []
+            task_list_3d=[]
+            for task in task_list :
+                if task.endswith('video 1.1.zip'):
+                    task_list_2d.append(task)
+                elif task.endswith('point cloud format 1.0.zip'):
+                    task_list_3d.append(task)
+
             base_name = os.path.basename(path)
             # print(f'{base_name} 변환 중...')
             rel_name = os.path.relpath(path)
-            with zipfile.ZipFile(f'{path}/{filename}') as task :
-                tlist = task.namelist()
+            file_num=0
 
-                if 'annotations.xml' in tlist:
+            for filename in task_list_2d :
+
+                with zipfile.ZipFile(filename) as task :
+
+                    #2D 데이터 변환
                     with io.TextIOWrapper(task.open('annotations.xml', mode='r'), encoding='utf-8') as task_read :
                         xml_file = task_read.read()
                         root=ET.fromstring(xml_file)
@@ -183,128 +196,128 @@ for (path,dir,files) in os.walk(curr_path):
                                     if data.attrib['outside']=='0' :
                                         updatefile2(path,track, box, polygon, frame)
                     file_num += size
-                    
+                        
 
-            #3D 데이터 변환
-                elif 'meta.json' in tlist :
+                #3D 데이터 변환
+            for filename in task_list_3d:
+                with zipfile.ZipFile(filename) as task :
+                    tlist = task.namelist()
                     json_list = [j for j in tlist if 'ds0/ann/' in j]
 
                     for json_file in json_list :
                         name=json_file[8:-9]
-                        if not os.path.isfile(f'{path}/pickle/{name}.pickle'):
-                            newfile(name,path)
+                        name = rename(int(name))
 
                         with io.TextIOWrapper(task.open(json_file, mode='r'), encoding='utf-8') as task_read :
                             json_data = json.load(task_read)
 
                             for object in json_data['objects'] :
-
                                 for figure in json_data['figures']:
                                     if figure['objectKey'] == object['key'] :
                                         updatefile3(path,name,object,figure['geometry'])
-            # print(f'{base_name} 변환 완료')
+                # print(f'{base_name} 변환 완료')
 
 
-    #json 파일 생성
-    pickle_list = glob.glob(f'{path}/pickle/*.pickle')
-    for pickle_file in pickle_list:
-        with open(pickle_file, 'rb') as f:
-            data = pickle.load(f)
+        #json 파일 생성
+        pickle_list = glob.glob(f'{path}/pickle/*.pickle')
+        for pickle_file in pickle_list:
+            with open(pickle_file, 'rb') as f:
+                data = pickle.load(f)
 
-        new_json = {
-            "image": {
-                "image_path": data['image']['image_path']
-            },
+            new_json = {
+                "image": {
+                    "image_path": data['image']['image_path']
+                },
 
-            "point_cloud": {
-                "velodyne_path": data['point_cloud']['velodyne_path']
-            },
-            "meta": {
-                "time": data['meta']['time'],
-                "enviroment": data['meta']['enviroment'],
-                "weather": data['meta']['weather'],
-                "city": "Gwangju",
-                "terrain": "Urban",
-                "road_type": "",
-                "road_material": "Paved",
-                "parking_type1": "",
-                "parking_type2": "Normal"
-            }
-            ,
-            "calib": {
-                "intrinsic": [
-                    [1.4355784e3, 0.0, 9.6e2],
-                    [0.0, 1.44520767e3, 5.4e2],
-                    [0.0, 0.0, 1.0]
+                "point_cloud": {
+                    "velodyne_path": data['point_cloud']['velodyne_path']
+                },
+                "meta": {
+                    "time": data['meta']['time'],
+                    "enviroment": data['meta']['enviroment'],
+                    "weather": data['meta']['weather'],
+                    "city": "Gwangju",
+                    "terrain": "Urban",
+                    "road_type": "",
+                    "road_material": "Paved",
+                    "parking_type1": "",
+                    "parking_type2": "Normal"
+                }
+                ,
+                "calib": {
+                    "intrinsic": [
+                        [1.4355784e3, 0.0, 9.6e2],
+                        [0.0, 1.44520767e3, 5.4e2],
+                        [0.0, 0.0, 1.0]
+                    ],
+                    "dist": [0.101923, -0.32098, 0.014438, 0.001353],
+                    "rot": [[1.5372528], [-0.04260863], [0.02567258]],
+                    "tr": [[0.03620099], [1.23389899], [1.35197656]],
+                    "extrinsic": [
+                        [0.99898818, -0.04346468, -0.01155129],
+                        [-0.01009945, 0.03347534, -0.99938851],
+                        [0.04382479, 0.99849398, 0.0330025]
+                    ]
+                },
+                "bbox2d": [
                 ],
-                "dist": [0.101923, -0.32098, 0.014438, 0.001353],
-                "rot": [[1.5372528], [-0.04260863], [0.02567258]],
-                "tr": [[0.03620099], [1.23389899], [1.35197656]],
-                "extrinsic": [
-                    [0.99898818, -0.04346468, -0.01155129],
-                    [-0.01009945, 0.03347534, -0.99938851],
-                    [0.04382479, 0.99849398, 0.0330025]
+                "segmentation": [
+                ],
+                "bbox3d": [
+                    
                 ]
-            },
-            "bbox2d": [
-            ],
-            "segmentation": [
-            ],
-            "bbox3d": [
+            }
+
+            for i,b in enumerate(data['annos']['bbox']):
+                if not np.isnan(b).all() :
+                    bbox2 = {
+                        "name": ''.join([i for i in data['annos']['name'][i] if not i.isdigit()]),
+                        "occluded": data['annos']['occluded'][i],
+                        "bbox": b,
+                    }
+                    if data['annos']['parked'][i]!='nan':
+                        bbox2["status"] = "Parked" if data['annos']['parked'][i]=='true' else "Not Parked"
+                    new_json["bbox2d"].append(bbox2)
+
+                elif data['annos']['polygon'][i] != 'nan' :
+                    poly = data['annos']['polygon'][i].split(';')
+                    polygons = []
+                    for p in poly :
+                        polygons.append(p.split(','))
+
+                    segm = {
+                        "name": ''.join([i for i in data['annos']['name'][i] if not i.isdigit()]),
+                        "polygon": polygons
+                    }
+                    
+
+                    new_json['segmentation'].append(segm)
                 
-            ]
-        }
+                elif not np.isnan(data['annos']['dimensions'][i]).all():
+                    bbox3 ={
+                        "name": ''.join([i for i in data['annos']['name'][i] if not i.isdigit()]),
+                        "dimensions": data['annos']['dimensions'][i],
+                        "location": data['annos']['location'][i],
+                        "rotation_y": data['annos']['rotation_y'][i]
+                    }
 
-        for i,b in enumerate(data['annos']['bbox']):
-            if not np.isnan(b).all() :
-                bbox2 = {
-                    "name": ''.join([i for i in data['annos']['name'][i] if not i.isdigit()]),
-                    "occluded": data['annos']['occluded'][i],
-                    "bbox": b,
-                }
-                if data['annos']['parked'][i]!='nan':
-                    bbox2["status"] = "Parked" if data['annos']['parked'][i]=='true' else "Not Parked"
-                new_json["bbox2d"].append(bbox2)
+                    new_json['bbox3d'].append(bbox3)
 
-            elif data['annos']['polygon'][i] != 'nan' :
-                poly = data['annos']['polygon'][i].split(';')
-                polygons = []
-                for p in poly :
-                    polygons.append(p.split(','))
+            dumped = json.dumps(new_json, cls=NumpyEncoder,ensure_ascii=False)
 
-                segm = {
-                    "name": ''.join([i for i in data['annos']['name'][i] if not i.isdigit()]),
-                    "polygon": polygons
-                }
-                
+            base = os.path.basename(pickle_file)
+            name,ext = os.path.splitext(base)
 
-                new_json['segmentation'].append(segm)
+            if not os.path.exists(f'{path}/label'):
+                os.makedirs(f'{path}/label')
             
-            elif not np.isnan(data['annos']['dimensions'][i]).all():
-                bbox3 ={
-                    "name": data['annos']['name'][i],
-                    "dimensions": data['annos']['dimensions'][i],
-                    "location": data['annos']['location'][i],
-                    "rotation_y": data['annos']['rotation_y'][i]
-                }
-
-                new_json['bbox3d'].append(bbox3)
-
-        dumped = json.dumps(new_json, cls=NumpyEncoder,ensure_ascii=False)
-
-        base = os.path.basename(pickle_file)
-        name,ext = os.path.splitext(base)
-
-        if not os.path.exists(f'{path}/label'):
-            os.makedirs(f'{path}/label')
-        
-        with open(f'{path}/label/{name}.json', 'w', encoding='utf-8') as f:
-            f.write(dumped + '\n')
+            with open(f'{path}/label/{name}.json', 'w', encoding='utf-8') as f:
+                f.write(dumped + '\n')
 
 
-print('완료')
+    print('완료')
 
-# except Exception as e :
-#     print(f'에러 발생 : {e}')
+except Exception as e :
+    print(f'에러 발생 : {e}')
 
-# os.system('pause')
+os.system('pause')
