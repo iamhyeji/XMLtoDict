@@ -61,11 +61,24 @@ def newfile(frame,dir_path):
             'time':meta[5],
             'road_type':meta[6],
             'state' : meta[7],
-            'place' : meta[8],
-            'name' : meta[9],
+            'place' : meta[-4],
+            'name' : meta[-3],
             'length' : ' '.join(meta[10:])
         },
         'calib': {
+            "intrinsic": np.array([
+                [1.4355784e3, 0.0, 9.6e2],
+                [0.0, 1.44520767e3, 5.4e2],
+                [0.0, 0.0, 1.0]
+            ], dtype=np.float),
+            "dist": np.array([0.101923, -0.32098, 0.014438, 0.001353], dtype=np.float),
+            "rot": np.array([[1.5372528], [-0.04260863], [0.02567258]], dtype=np.float),
+            "tr": np.array([[0.03620099], [1.23389899], [1.35197656]], dtype=np.float),
+            "extrinsic": np.array([
+                [0.99898818, -0.04346468, -0.01155129],
+                [-0.01009945, 0.03347534, -0.99938851],
+                [0.04382479, 0.99849398, 0.0330025]
+            ], dtype=np.float)           
         },              
         'annos': {
             'name': np.array([], dtype = '<U10'),
@@ -147,7 +160,7 @@ def updatefile3(path,name,object, geometry):
 
 try:
     print('변환 중 ..')
-    # curr_path = os.path.dirname(sys.executable)   #exe파일생성시
+    curr_path = os.path.dirname(sys.executable)   #exe파일생성시
     curr_path = os.path.dirname(os.path.realpath(__file__))
     dir_list = ['*Camera','AVM','INS','LiDAR','RADAR','Vehicle']
 
@@ -207,6 +220,8 @@ try:
                     for json_file in json_list :
                         name=json_file[8:-9]
                         name = rename(int(name))
+                        if not os.path.isfile(f'{path}/pickle/{name}.pickle'):
+                            newfile(name,path)
 
                         with io.TextIOWrapper(task.open(json_file, mode='r'), encoding='utf-8') as task_read :
                             json_data = json.load(task_read)
@@ -236,6 +251,7 @@ try:
                     "time": data['meta']['time'],
                     "enviroment": data['meta']['enviroment'],
                     "weather": data['meta']['weather'],
+                    "place":data['meta']['place'],
                     "city": "Gwangju",
                     "terrain": "Urban",
                     "road_type": "",
@@ -245,19 +261,11 @@ try:
                 }
                 ,
                 "calib": {
-                    "intrinsic": [
-                        [1.4355784e3, 0.0, 9.6e2],
-                        [0.0, 1.44520767e3, 5.4e2],
-                        [0.0, 0.0, 1.0]
-                    ],
-                    "dist": [0.101923, -0.32098, 0.014438, 0.001353],
-                    "rot": [[1.5372528], [-0.04260863], [0.02567258]],
-                    "tr": [[0.03620099], [1.23389899], [1.35197656]],
-                    "extrinsic": [
-                        [0.99898818, -0.04346468, -0.01155129],
-                        [-0.01009945, 0.03347534, -0.99938851],
-                        [0.04382479, 0.99849398, 0.0330025]
-                    ]
+                    "intrinsic": data['calib']['intrinsic'],
+                    "dist": data['calib']['dist'],
+                    "rot": data['calib']['rot'],
+                    "tr": data['calib']['tr'],
+                    "extrinsic": data['calib']['extrinsic'],
                 },
                 "bbox2d": [
                 ],
@@ -283,7 +291,8 @@ try:
                     poly = data['annos']['polygon'][i].split(';')
                     polygons = []
                     for p in poly :
-                        polygons.append(p.split(','))
+                        polygons.append([float(i) for i in p.split(',')])
+                    
 
                     segm = {
                         "name": ''.join([i for i in data['annos']['name'][i] if not i.isdigit()]),
