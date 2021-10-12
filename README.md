@@ -1,9 +1,9 @@
 # XMLtoDict
-- 본 프로그램은 지엔랩스의 Customize Datasets 가공 프로그램입니다.
+
 - ⭐ cutomize_top 프로그램 추가 : 상위 폴더에서 실행하면 하위 모든 파일의 데이터를 변환해줍니다.
 - ⭐ 폴더 이름이 210712_155529_10hz_outdoor_sunny_day_general road_driving_주행_이준수_506s_5069ea 형태로 있어야 메타데이터가 정상적으로  입력됩니다.
 
-
+- 본 프로그램은 지엔랩스의 Customize Datasets 가공 프로그램입니다.
 - 현재 waveai의 디렉토리 구조는 아래 형식으로 이루어져있습니다.  
   일반도로 데이터  
   ├──2107  
