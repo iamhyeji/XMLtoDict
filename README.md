@@ -1,4 +1,8 @@
 # XMLtoDict
+
+- ⭐ cutomize_top 프로그램 추가 : 상위 폴더에서 실행하면 하위 모든 파일의 데이터를 변환해줍니다.
+- ⭐ 폴더 이름이 210712_155529_10hz_outdoor_sunny_day_general road_driving_주행_이준수_506s_5069ea 형태로 있어야 메타데이터가 정상적으로  입력됩니다.
+
 - 본 프로그램은 지엔랩스의 Customize Datasets 가공 프로그램입니다.
 - 현재 waveai의 디렉토리 구조는 아래 형식으로 이루어져있습니다.  
   일반도로 데이터  
@@ -30,5 +34,5 @@
   **│   │   │   ├──task_test8_3d-2021_09_06_08_58_39-sly point cloud format 1.0.zip  
   │   │   │   ├──task_test8-2021_09_06_09_11_57-cvat for video 1.1.zip**
   
-- ⭐ cutomize_top 프로그램 추가 : 상위 폴더에서 실행하면 하위 모든 파일의 데이터를 변환해줍니다.
+
   
